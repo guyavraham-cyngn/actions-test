@@ -1,0 +1,26 @@
+name: List ECR Images (OIDC)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  list-images:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: us-east-2   # change if needed
+
+      - name: List images
+        run: |
+          aws ecr list-images \
+            --repository-name 320959454024.dkr.ecr.us-east-2.amazonaws.com/actions-test \
+            --query 'imageIds[*].imageTag' \
+            --output table
