@@ -17,6 +17,9 @@ jobs:
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           aws-region: us-east-1   # change if needed
+      - name: Show existing ECR repos
+        run: aws ecr describe-repositories --output table
+
 
       - name: List all image tags
         run: |
