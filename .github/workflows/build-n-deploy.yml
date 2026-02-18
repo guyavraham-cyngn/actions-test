@@ -31,26 +31,36 @@ jobs:
       - name: Login to ECR
         run: |
           aws ecr get-login-password --region $AWS_REGION | \
-          docker login --username AWS \
-          --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+          docker login \
+            --username AWS \
+            --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
-      - name: Build Docker image
+      # =========================
+      # Backend
+      # =========================
+      - name: Build backend image
         run: |
-          docker build -t $ECR_REPOSITORY:${{ github.sha }} .
+          docker build \
+            -f backend/scripts/Dockerfile \
+            -t $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:backend-${{ github.sha }} \
+            backend
 
-      - name: Tag image for ECR
-        run: |
-          docker tag $ECR_REPOSITORY:${{ github.sha }} \
-          $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:${{ github.sha }}
-
-      - name: Push image to ECR
+      - name: Push backend image
         run: |
           docker push \
-          $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:${{ github.sha }}
+            $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:backend-${{ github.sha }}
 
-      - name: Deploy to ECS
+      # =========================
+      # Frontend
+      # =========================
+      - name: Build frontend image
         run: |
-          aws ecr get-login-password --region $AWS_REGION | \
-          docker login --username AWS \
-          --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
-              
+          docker build \
+            -f frontend/scripts/Dockerfile \
+            -t $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:frontend-${{ github.sha }} \
+            frontend
+
+      - name: Push frontend image
+        run: |
+          docker push \
+            $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:frontend-${{ github.sha }}
