@@ -16,6 +16,7 @@ jobs:
     env:
       AWS_REGION: us-east-2
       ECR_REPOSITORY: actions-test
+      ACCOUNT_ID: 320959454024
 
     steps:
       - name: Checkout code
@@ -31,7 +32,7 @@ jobs:
         run: |
           aws ecr get-login-password --region $AWS_REGION | \
           docker login --username AWS \
-          --password-stdin 320959454024.dkr.ecr.$AWS_REGION.amazonaws.com
+          --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
       - name: Build Docker image
         run: |
@@ -40,12 +41,12 @@ jobs:
       - name: Tag image for ECR
         run: |
           docker tag $ECR_REPOSITORY:${{ github.sha }} \
-          320959454024.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:${{ github.sha }}
+          $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:${{ github.sha }}
 
       - name: Push image to ECR
         run: |
           docker push \
-          320959454024.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:${{ github.sha }}
+          $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:${{ github.sha }}
 
       - name: Deploy to ECS
         run: |
