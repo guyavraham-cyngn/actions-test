@@ -35,6 +35,9 @@ jobs:
             --username AWS \
             --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
+      - name: Debug folder structure
+        run: ls -R
+  
       # =========================
       # Backend
       # =========================
